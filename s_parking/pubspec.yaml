@@ -1,0 +1,28 @@
+name: s_parking
+description: "A new Flutter project."
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: ^3.7.2
+
+dependencies:
+  flutter:
+    sdk: flutter
+  
+  firebase_core: ^3.13.0 # Thêm số phiên bản ở đây
+  firebase_auth: ^5.5.3 # Thêm số phiên bản ở đây
+  firebase_database: ^11.3.5 # Thêm số phiên bản ở đây
+  flutter_bloc: ^9.1.1 # Thêm số phiên bản ở đây
+  equatable: ^2.0.7 # Thêm số phiên bản ở đây
+  bloc: ^9.0.0
+
+  # Thêm các package khác bạn có thể cần
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^5.0.0
+
+flutter:
+  uses-material-design: true

@@ -1,0 +1,92 @@
+{
+  "bookings": {
+    "-ORWK_jwtUB9jja_Wv4E": {
+      "booking_creation_time": "2025-05-30T20:16:37.245878",
+      "booking_end_time": "2025-05-31T20:55:00.000",
+      "booking_start_time": "2025-05-30T20:55:00.000",
+      "lot_ID": "lot_1",
+      "phone_number": "0937256111",
+      "rfid_tag_expected": "96E1B5F9",
+      "spot_ID": "spot_1",
+      "status": "confirmed",
+      "userID": "9NWQ3w0aNbg83otstX58oo3vZYi1"
+    }
+  },
+  "parking_lots": {
+    "lot_1": {
+      "available_spots": 2,
+      "location": "144 Xuân Thuỷ - Cầu Giấy - Hà Nội",
+      "name": "Parking Lot A",
+      "spots": {
+        "spot_1": {
+          "booking_end_time": "2025-05-31T20:55:00.000",
+          "booking_ref": "-ORWK_jwtUB9jja_Wv4E",
+          "booking_start_time": "2025-05-30T20:55:00.000",
+          "phone_number": "0937256111",
+          "rfid_tag": "96E1B5F9",
+          "status": "reserved",
+          "time_in": "2025-05-31T03:59:38.663Z",
+          "userID": "9NWQ3w0aNbg83otstX58oo3vZYi1"
+        },
+        "spot_2": {
+          "rfid_tag": "DDEB82C3",
+          "status": "occupied",
+          "time_in": "2025-05-30T13:16:47.086Z"
+        },
+        "spot_3": {
+          "rfid_tag": "1C50D483",
+          "status": "pending_entries",
+          "time_in": "2025-05-31T03:29:15.445Z"
+        },
+        "spot_4": {
+          "status": "empty"
+        },
+        "spot_5": {
+          "status": "empty"
+        },
+        "spot_6": {
+          "status": "empty"
+        }
+      },
+      "total_spots": 6
+    },
+    "lot_2": {
+      "available_spots": 10,
+      "location": "8 Tôn Thất Thuyết - Cầu Giấy - Hà Nội",
+      "name": "Parking Lot B",
+      "spots": {
+        "spot_A": {
+          "status": "empty"
+        },
+        "spot_B": {
+          "status": "empty"
+        },
+        "spot_C": {
+          "status": "empty"
+        },
+        "spot_D": {
+          "status": "empty"
+        },
+        "spot_E": {
+          "status": "empty"
+        },
+        "spot_F": {
+          "status": "empty"
+        },
+        "spot_G": {
+          "status": "empty"
+        },
+        "spot_H": {
+          "status": "empty"
+        },
+        "spot_I": {
+          "status": "empty"
+        },
+        "spot_J": {
+          "status": "empty"
+        }
+      },
+      "total_spots": 10
+    }
+  }
+}

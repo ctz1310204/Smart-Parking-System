@@ -1,0 +1,1294 @@
+[
+    {
+        "id": "3bcad979e3234c31",
+        "type": "tab",
+        "label": "node vào/ra",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "1b48354d57473ee9",
+        "type": "tab",
+        "label": "node ở chỗ đỗ xe ",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "a16b73657f0d2c2a",
+        "type": "tab",
+        "label": "dashboard bãi đỗ xe",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "aee7f3977f504759",
+        "type": "firebase config",
+        "firebaseurl": "smartparking-7d8b2-default-rtdb",
+        "loginType": "none"
+    },
+    {
+        "id": "ui_tab_parking",
+        "type": "ui_tab",
+        "name": "Giám sát bãi xe",
+        "icon": "dashboard",
+        "order": 1,
+        "disabled": false,
+        "hidden": false
+    },
+    {
+        "id": "ui_group_lot1",
+        "type": "ui_group",
+        "name": "Lot 1: 144 Xuân Thuỷ - Cầu Giấy - Hà Nội",
+        "tab": "ui_tab_parking",
+        "order": 1,
+        "disp": true,
+        "width": "12",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "d4352cd696f371f7",
+        "type": "ui_base",
+        "theme": {
+            "name": "theme-light",
+            "lightTheme": {
+                "default": "#0094CE",
+                "baseColor": "#0094CE",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": false
+            },
+            "darkTheme": {
+                "default": "#097479",
+                "baseColor": "#097479",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif",
+                "edited": false
+            },
+            "customTheme": {
+                "name": "Untitled Theme 1",
+                "default": "#4B7930",
+                "baseColor": "#4B7930",
+                "baseFont": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+            },
+            "themeState": {
+                "base-color": {
+                    "default": "#0094CE",
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-titlebar-backgroundColor": {
+                    "value": "#0094CE",
+                    "edited": false
+                },
+                "page-backgroundColor": {
+                    "value": "#fafafa",
+                    "edited": false
+                },
+                "page-sidebar-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-textColor": {
+                    "value": "#1bbfff",
+                    "edited": false
+                },
+                "group-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "group-backgroundColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "widget-textColor": {
+                    "value": "#111111",
+                    "edited": false
+                },
+                "widget-backgroundColor": {
+                    "value": "#0094ce",
+                    "edited": false
+                },
+                "widget-borderColor": {
+                    "value": "#ffffff",
+                    "edited": false
+                },
+                "base-font": {
+                    "value": "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen-Sans,Ubuntu,Cantarell,Helvetica Neue,sans-serif"
+                }
+            },
+            "angularTheme": {
+                "primary": "indigo",
+                "accents": "blue",
+                "warn": "red",
+                "background": "grey",
+                "palette": "light"
+            }
+        },
+        "site": {
+            "name": "Node-RED Dashboard",
+            "hideToolbar": "false",
+            "allowSwipe": "false",
+            "lockMenu": "false",
+            "allowTempTheme": "true",
+            "dateFormat": "DD/MM/YYYY",
+            "sizes": {
+                "sx": 48,
+                "sy": 48,
+                "gx": 6,
+                "gy": 6,
+                "cx": 6,
+                "cy": 6,
+                "px": 0,
+                "py": 0
+            }
+        }
+    },
+    {
+        "id": "bfc4b6c8944ad373",
+        "type": "http in",
+        "z": "3bcad979e3234c31",
+        "name": "",
+        "url": "esp8266/rfid_in",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 100,
+        "y": 140,
+        "wires": [
+            [
+                "45ed03fceed39806",
+                "08591338e8fb8793"
+            ]
+        ]
+    },
+    {
+        "id": "45ed03fceed39806",
+        "type": "json",
+        "z": "3bcad979e3234c31",
+        "name": "",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 230,
+        "y": 240,
+        "wires": [
+            [
+                "6bb441ef728eee9e"
+            ]
+        ]
+    },
+    {
+        "id": "6bb441ef728eee9e",
+        "type": "function",
+        "z": "3bcad979e3234c31",
+        "name": "Cập nhật RFID và lưu thông tin",
+        "func": "// 🎫 1. Lấy RFID từ payload gốc\nconst rfid_uid = msg.payload.rfid_uid;\nif (!rfid_uid) {\n    node.error(\"Thiếu rfid_uid trong payload XE VÀO\", msg);\n    msg.payload = { \n        action: \"error\",\n        message: \"Yêu cầu không hợp lệ: Thiếu rfid_uid.\",\n        available_spots: null\n    };\n    msg.statusCode = 400;\n    return null;      // dừng flow, sẽ có HTTP-response riêng\n}\n\n// Chuẩn hoá RFID thành CHỮ HOA để so khớp DB\nmsg.rfid_uid_received = rfid_uid.toUpperCase();\nmsg.original_http_payload = msg.payload;   // lưu để dùng tiếp\n\n/*───────────────────────────────────────────\n  2. Chuẩn bị QUERY cho node firebase.once\n    • orderByChild  : sắp theo trường rfid_tag_expected\n    • equalTo       : bằng đúng RFID vừa quét\n    • limitToFirst  : chỉ lấy 1 record (giảm băng thông)\n   ※ Firebase RTDB chỉ cho 1 orderBy…/equalTo mỗi truy vấn,\n     nên ta lọc RFID trên server, còn status (active/confirmed)\n     sẽ lọc tiếp trong Function sau khi nhận về.\n───────────────────────────────────────────*/\n\nmsg.payload = {\n  orderByChild : \"rfid_tag_expected\",\n  equalTo      : msg.rfid_uid_received,\n  limitToFirst : 1          // tuỳ chọn nhưng nên có\n};\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 390,
+        "y": 120,
+        "wires": [
+            [
+                "3acfbee4dc6e7c08",
+                "e0e91be86a8662f0"
+            ]
+        ]
+    },
+    {
+        "id": "861d27250d9190e7",
+        "type": "function",
+        "z": "3bcad979e3234c31",
+        "name": "Kiểm tra bookings trên server",
+        "func": "// Kết quả từ Firebase Get (toàn bộ nhánh bookings)\nmsg.bookings_query_result = msg.payload;\n\nmsg.has_valid_reservation = false;\nmsg.reserved_spot_id = null;\nmsg.booking_id_to_update = null;\n\nconst rfid_uid_received = msg.rfid_uid_received; // Lấy RFID đã nhận từ node trước\n\nif (msg.bookings_query_result && typeof msg.bookings_query_result === 'object') {\n    const bookingIds = Object.keys(msg.bookings_query_result);\n    for (const bookingId of bookingIds) {\n        const booking = msg.bookings_query_result[bookingId];\n\n        // Thêm điều kiện kiểm tra rfid_tag_expected VÀ các điều kiện khác\n        if ((booking.status === 'active' || booking.status === 'confirmed') &&\n            booking.spot_ID &&\n            booking.lot_ID === 'lot_1' &&\n            booking.rfid_tag_expected === rfid_uid_received // THÊM DÒNG NÀY ĐỂ LỌC TRÊN NODE-RED\n        ) {\n             msg.has_valid_reservation = true;\n             msg.reserved_spot_id = booking.spot_ID;\n             msg.booking_id_to_update = bookingId;\n             break; // Tìm thấy 1 booking hợp lệ, dừng lại\n        }\n    }\n}\n\ndelete msg.payload;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 790,
+        "y": 100,
+        "wires": [
+            [
+                "c925da490a3e1b6c",
+                "34e50b7479ad36ec"
+            ]
+        ]
+    },
+    {
+        "id": "c925da490a3e1b6c",
+        "type": "switch",
+        "z": "3bcad979e3234c31",
+        "name": "Đã booking chỗ chưa",
+        "property": "has_valid_reservation",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1040,
+        "y": 180,
+        "wires": [
+            [
+                "b863f79f19227765"
+            ],
+            [
+                "6c55461978ec3081"
+            ]
+        ]
+    },
+    {
+        "id": "908f454b96d4dd07",
+        "type": "function",
+        "z": "3bcad979e3234c31",
+        "name": "Đã đặt chỗ: chuẩn bị cập nhật thông tin ",
+        "func": "msg.action_result_final = \"open_reserved\";\nmsg.message_final = `Mời vào chỗ đặt trước: ${msg.reserved_spot_id}.`;\nmsg.statusCode_final = 200;\n\n// Chuẩn bị cập nhật Firebase: cập nhật spot status thành pending_entries\n// và giảm available_spots đi 1 ngay lập tức.\n\nlet updatePayload = {};\nupdatePayload[`parking_lots/lot_1/spots/${msg.reserved_spot_id}/status`] = \"pending_entries\";\nupdatePayload[`parking_lots/lot_1/spots/${msg.reserved_spot_id}/rfid_tag`] = msg.rfid_uid_received;\nupdatePayload[`parking_lots/lot_1/spots/${msg.reserved_spot_id}/time_in`] = new Date().toISOString();\n\n// Đọc số chỗ trống hiện tại và tổng số chỗ từ dữ liệu bãi đỗ (msg.payload từ 78de2ad6bce037b7)\n// Giả định msg.payload (sau node 78de2ad6bce037b7) là toàn bộ data parking_lots/lot_1\nconst lotData = msg.payload; \nconst totalSpots = parseInt(lotData.total_spots) || 0;\n\nlet occupiedCount = 0;\nlet reservedCount = 0;\nlet pendingCount = 0;\n\n// Đếm các trạng thái hiện tại từ lotData\nfor (const spotId of Object.keys(lotData.spots || {})) {\n    const spot = lotData.spots[spotId];\n    if (spot.status === \"occupied\") {\n        occupiedCount++;\n    } else if (spot.status === \"reserved\") {\n        reservedCount++;\n    } else if (spot.status === \"pending_entries\") {\n        pendingCount++;\n    }\n}\n\n// Cập nhật số pending_entries sau khi xe vào (tăng 1)\npendingCount++;\n\n// Tính toán lại available_spots\nconst newAvailableSpots = Math.max(0, totalSpots - reservedCount - occupiedCount - pendingCount);\nupdatePayload[`parking_lots/lot_1/available_spots`] = newAvailableSpots; // Cập nhật available_spots\nmsg.spots_to_report_in_response = newAvailableSpots;\n\nmsg.payload = updatePayload;\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1480,
+        "y": 60,
+        "wires": [
+            [
+                "d5a6313c0e481b5a",
+                "0fdd3b76ba0c12bd"
+            ]
+        ]
+    },
+    {
+        "id": "35f435f3318317dc",
+        "type": "function",
+        "z": "3bcad979e3234c31",
+        "name": "Chưa đặt chỗ: kiểm tra và cập nhật lên hệ thống",
+        "func": "const rfid = msg.rfid_uid_received;\nconst lotData = msg.payload; // lotData là dữ liệu từ parking_lots/lot_1\n\nlet foundSpotId = null;\nlet updatePayload = {};\n\n// Kiểm tra dữ liệu đầu vào\nif (!lotData || typeof lotData !== 'object' || !lotData.spots) {\n    node.error(\"ENTRY WALKIN: Không đọc được dữ liệu spots hợp lệ từ Firebase.\", msg);\n    msg.perform_walkin_update = false;\n    msg.statusCode_final = 500;\n    msg.action_result_final = \"error_walkin\";\n    msg.message_final = \"Lỗi hệ thống (walk-in entry): Dữ liệu bãi đỗ không đúng.\";\n    msg.spots_to_report_in_response = lotData && typeof lotData.available_spots !== 'undefined' ? parseInt(lotData.available_spots) : null;\n    return msg;\n}\n\n// Duyệt tìm 1 chỗ trống có status là \"empty\"\nconst spotIds = Object.keys(lotData.spots);\nfor (const spotId of spotIds) {\n    const spot = lotData.spots[spotId];\n    if (spot.status === \"empty\") {\n        foundSpotId = spotId;\n        break;\n    }\n}\n\nlet newAvailableSpots = 0; // Khởi tạo giá trị chỗ trống mới\n\nif (foundSpotId) {\n    // Nếu tìm thấy chỗ trống: Chuẩn bị cập nhật cho spot cụ thể thành 'pending_entries'\n    updatePayload[`parking_lots/lot_1/spots/${foundSpotId}/status`] = \"pending_entries\";\n    updatePayload[`parking_lots/lot_1/spots/${foundSpotId}/rfid_tag`] = rfid;\n    updatePayload[`parking_lots/lot_1/spots/${foundSpotId}/time_in`] = new Date().toISOString();\n\n    // Tính toán lại available_spots ngay lập tức\n    const totalSpots = parseInt(lotData.total_spots) || 0;\n    let occupiedCount = 0;\n    let reservedCount = 0;\n    let pendingCount = 0;\n\n    // Đếm các trạng thái hiện tại từ lotData\n    for (const spotId of spotIds) {\n        const spot = lotData.spots[spotId];\n        if (spot.status === \"occupied\") {\n            occupiedCount++;\n        } else if (spot.status === \"reserved\") {\n            reservedCount++;\n        } else if (spot.status === \"pending_entries\") {\n            pendingCount++;\n        }\n    }\n    \n    // Cập nhật số pending_entries sau khi xe vào (tăng 1)\n    pendingCount++;\n\n    newAvailableSpots = Math.max(0, totalSpots - reservedCount - occupiedCount - pendingCount);\n    updatePayload[`parking_lots/lot_1/available_spots`] = newAvailableSpots;\n\n    msg.perform_walkin_update = true;\n    msg.payload = updatePayload; // Payload này sẽ được gửi tới node firebase modify\n\n    // Thiết lập các cờ cho phản hồi HTTP cuối cùng\n    msg.statusCode_final = 200;\n    msg.action_result_final = \"open_walk_in\";\n    msg.message_final = `Mời xe vãng lai vào chỗ ${foundSpotId}.`;\n    msg.spots_to_report_in_response = newAvailableSpots; // Báo cáo giá trị mới tính được\n\n} else {\n    // Nếu không tìm thấy chỗ trống nào\n    msg.perform_walkin_update = false;\n    msg.statusCode_final = 403; // Forbidden\n    msg.action_result_final = \"deny_walk_in\";\n    msg.message_final = \"Bãi đã hết chỗ cho xe vãng lai.\";\n    // Báo cáo số chỗ trống hiện tại (lấy từ dữ liệu database đọc được)\n    let currentOccupied = 0;\n    let currentReserved = 0;\n    let currentPending = 0;\n    for (const spotId of spotIds) {\n        const spot = lotData.spots[spotId];\n        if (spot.status === \"occupied\") {\n            currentOccupied++;\n        } else if (spot.status === \"reserved\") {\n            currentReserved++;\n        } else if (spot.status === \"pending_entries\") {\n            currentPending++;\n        }\n    }\n    msg.spots_to_report_in_response = Math.max(0, totalSpots - currentOccupied - currentReserved - currentPending); // Báo cáo số chỗ trống hiện tại\n}\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1630,
+        "y": 300,
+        "wires": [
+            [
+                "5d32da0199d28830",
+                "31ac22796785a1fe"
+            ]
+        ]
+    },
+    {
+        "id": "5d32da0199d28830",
+        "type": "switch",
+        "z": "3bcad979e3234c31",
+        "name": "Còn chỗ hãy không",
+        "property": "perform_walkin_update",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "true"
+            },
+            {
+                "t": "false"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 2,
+        "x": 1950,
+        "y": 260,
+        "wires": [
+            [
+                "2a2154627b9cc6f8"
+            ],
+            [
+                "7d8b4c92a45976d3"
+            ]
+        ]
+    },
+    {
+        "id": "f2233f9863e6e7aa",
+        "type": "function",
+        "z": "3bcad979e3234c31",
+        "name": "Thông báo đã vào thành công",
+        "func": "msg.payload = {\n    action: msg.action_result_final,\n    message: msg.message_final,\n    rfid_received: msg.rfid_uid_received,\n    available_spots: msg.spots_to_report_in_response \n};\nmsg.statusCode = msg.statusCode_final;\n\n// Dọn dẹp (giữ lại các trường cần thiết cho phản hồi)\nconst responsePayload = msg.payload;\nconst statusCode = msg.statusCode;\n\n// Xóa tất cả các trường khác trong msg trừ _msgid\nfor (const key in msg) {\n    if (key !== '_msgid' && key !== 'payload' && key !== 'statusCode') {\n        delete msg[key];\n    }\n}\n\nmsg.payload = responsePayload; // Gán lại payload phản hồi\nmsg.statusCode = statusCode; // Gán lại statusCode phản hồi\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2420,
+        "y": 100,
+        "wires": [
+            [
+                "20bb7537c93657b3",
+                "bc9bb00bb73abea2"
+            ]
+        ]
+    },
+    {
+        "id": "bc9bb00bb73abea2",
+        "type": "http response",
+        "z": "3bcad979e3234c31",
+        "name": "Mở cổng",
+        "statusCode": "",
+        "headers": {},
+        "x": 2700,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "aefbf2e41380e311",
+        "type": "http in",
+        "z": "3bcad979e3234c31",
+        "name": "",
+        "url": "/esp8266_out",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 90,
+        "y": 780,
+        "wires": [
+            [
+                "534ba754c789ac8c"
+            ]
+        ]
+    },
+    {
+        "id": "534ba754c789ac8c",
+        "type": "json",
+        "z": "3bcad979e3234c31",
+        "name": "",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 230,
+        "y": 860,
+        "wires": [
+            [
+                "d89bd759321da301"
+            ]
+        ]
+    },
+    {
+        "id": "d89bd759321da301",
+        "type": "function",
+        "z": "3bcad979e3234c31",
+        "name": "Cập nhật RFID và lưu thông tin",
+        "func": "const rfid_uid = msg.payload.rfid_uid;\nif (!rfid_uid) {\n    node.error(\"Thiếu rfid_uid trong payload XE RA\", msg);\n    msg.payload = { action: \"error\", message: \"Yêu cầu không hợp lệ XE RA: Thiếu rfid_uid.\", available_spots: null };\n    msg.statusCode = 400;\n    return msg; \n}\nmsg.rfid_uid_received = rfid_uid.toUpperCase();\n\n// Chuẩn bị lấy dữ liệu toàn bộ DB để tìm spot có rfid_tag khớp\n// Childpath để trống để lấy toàn bộ DB, sau đó lọc trong Function\nmsg.firebase_get_path = \"\"; // Đã set childpath cho node firebase.once tiếp theo\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 780,
+        "wires": [
+            [
+                "e55caf42c0936b6d",
+                "df115a108ed489e0"
+            ]
+        ]
+    },
+    {
+        "id": "ded77b69850a81fe",
+        "type": "function",
+        "z": "3bcad979e3234c31",
+        "name": "Kiểm tra thẻ RFID",
+        "func": "// msg.payload hiện tại chứa TOÀN BỘ cấu trúc database Firebase (parking_lots và bookings)\n// msg.rfid_uid_received chứa RFID đã quét (ở dạng chữ HOA)\n\nconst fullDbData = msg.payload;\nconst rfidToFind = msg.rfid_uid_received;\nconst currentTime = new Date().toISOString(); // Lấy thời gian hiện tại theo định dạng ISO 8601\n\nlet spotToUpdateId = null;\nlet bookingToDeleteRef = null; // Lưu trữ tham chiếu booking nếu tìm thấy\nlet updatedPayload = JSON.parse(JSON.stringify(fullDbData)); // Deep copy để sửa đổi\n\n\n// --- 1. Kiểm tra cấu trúc dữ liệu database nhận được ---\nif (typeof updatedPayload !== 'object' || updatedPayload === null ||\n    !updatedPayload.parking_lots || !updatedPayload.parking_lots.lot_1 || !updatedPayload.parking_lots.lot_1.spots) {\n\n    node.error(`EXIT (Full DB Read): Cấu trúc database không hợp lệ hoặc thiếu node quan trọng.`, msg);\n\n    msg.action_result_final = \"error_exit\";\n    msg.message_final = \"Lỗi hệ thống (exit): Dữ liệu bãi đỗ không đúng hoặc thiếu.\";\n    msg.spots_to_report_in_response = null; // Không báo cáo số chỗ trống ở đây nữa\n    msg.statusCode_final = 500;\n\n    // Xóa payload để tránh gửi dữ liệu lỗi cho node firebase modify\n    msg.payload = {};\n\n    // Trả về message lỗi qua output 2\n    return [null, msg];\n}\n\nconst lotData = updatedPayload.parking_lots.lot_1;\nconst spots = lotData.spots;\nconst totalSpots = parseInt(lotData.total_spots) || 0;\n\n\n// --- 2. Tìm chỗ đỗ đang có xe với RFID khớp (bao gồm cả trường hợp IR đã báo empty) ---\nconst spotIds = Object.keys(spots || {});\nfor (const spotId of spotIds) {\n    const spot = spots[spotId];\n    // Tìm spot có rfid_tag khớp VÀ (đang ở trạng thái 'occupied' HOẶC 'pending_entries' HOẶC 'empty' nhưng vẫn có rfid_tag)\n    // IR không xóa rfid_tag nên chúng ta có thể tìm thấy nó ngay cả khi spot đã là empty.\n    if (spot && spot.rfid_tag === rfidToFind && (spot.status === \"occupied\" || spot.status === \"pending_entries\" || spot.status === \"empty\" || spot.status === \"reserved\")) {\n        // Luôn ưu tiên xử lý xe ra nếu RFID khớp\n        spotToUpdateId = spotId;\n        if (spot.booking_ref) {\n            bookingToDeleteRef = spot.booking_ref;\n        }\n        break;\n    }\n}\n\n// --- 3. Chuẩn bị payload cập nhật/xóa và phản hồi dựa trên kết quả tìm kiếm ---\nif (spotToUpdateId) {\n    // Lấy trạng thái hiện tại của chỗ đỗ trước khi cập nhật\n    const currentSpotStatus = spots[spotToUpdateId].status;\n\n    // --- Cập nhật trạng thái chỗ đỗ trong payload ---\n    spots[spotToUpdateId].status = \"empty\"; // Chuyển chỗ đỗ thành empty\n    spots[spotToUpdateId].rfid_tag = null; // Xóa RFID khi xe ra khỏi cổng\n    spots[spotToUpdateId].time_in = null; // Xóa time_in\n    spots[spotToUpdateId].time_out = currentTime; // Lưu time_out\n    spots[spotToUpdateId].booking_ref = null; // Xóa tham chiếu booking trên spot\n    spots[spotToUpdateId].phone_number = null; // Xóa phone_number trên spot\n    spots[spotToUpdateId].userID = null; // Xóa userID trên spot\n    spots[spotToUpdateId].booking_start_time = null; // Xóa thời gian booking dự kiến\n    spots[spotToUpdateId].booking_end_time = null; // Xóa thời gian booking dự kiến\n\n\n    // Tính toán lại available_spots chỉ khi trạng thái ĐANG THỰC SỰ THAY ĐỔI TỪ CÓ XE SANG KHÔNG CÓ XE\n    // Tức là, nếu trước đó là 'occupied', 'pending_entries', 'reserved' (và rfid khớp)\n    // Nếu nó đã là 'empty' rồi thì không cần tăng available_spots nữa (vì IR đã làm)\n    let shouldIncreaseAvailableSpots = false;\n    if (currentSpotStatus === \"occupied\" || currentSpotStatus === \"pending_entries\" || currentSpotStatus === \"reserved\") {\n        shouldIncreaseAvailableSpots = true;\n    }\n\n    let occupiedCount = 0;\n    let reservedCount = 0;\n    let pendingCount = 0;\n\n    // Đếm các trạng thái HIỆN TẠI từ updatedPayload (bao gồm chỗ vừa chuyển sang empty)\n    for (const spotId of Object.keys(spots || {})) {\n        const spot = spots[spotId];\n        if (spot.status === \"occupied\") {\n            occupiedCount++;\n        } else if (spot.status === \"reserved\") {\n            reservedCount++;\n        } else if (spot.status === \"pending_entries\") {\n            pendingCount++;\n        }\n    }\n\n    // Tính toán lại available_spots\n    const newAvailableSpots = Math.max(0, totalSpots - reservedCount - occupiedCount - pendingCount);\n    lotData.available_spots = newAvailableSpots; // Cập nhật available_spots\n\n\n    // --- Xử lý xóa Booking trong payload (nếu tìm thấy booking_ref) ---\n    if (bookingToDeleteRef && updatedPayload.bookings && updatedPayload.bookings[bookingToDeleteRef]) {\n        updatedPayload.bookings[bookingToDeleteRef] = null; // Đặt thành null để Firebase xóa\n        node.warn(`[EXIT] Đã tìm thấy booking ${bookingToDeleteRef} cho xe ra tại chỗ ${spotToUpdateId}. Chuẩn bị xoá booking.`);\n    } else if (bookingToDeleteRef) {\n         node.warn(`[EXIT] Cảnh báo: Booking ref ${bookingToDeleteRef} tìm thấy trên chỗ ${spotToUpdateId} nhưng không tồn tại trong node /bookings.`);\n    }\n\n    // --- Chuẩn bị message phản hồi thành công ---\n    msg.action_result_final = \"exit_success\";\n    msg.message_final = \"Cảm ơn đã sử dụng dịch vụ!\";\n    msg.spots_to_report_in_response = newAvailableSpots; // Báo cáo số chỗ trống mới\n    msg.statusCode_final = 200;\n\n    msg.payload = updatedPayload; // Payload này sẽ được gửi tới node firebase modify\n    return [msg, null]; // Gửi về nhánh thành công\n\n} else {\n    // --- Xử lý không tìm thấy xe đang đỗ với RFID này ---\n    msg.action_result_final = \"exit_rfid_not_found\";\n    msg.message_final = \"Không tìm thấy xe với RFID này đang đỗ trong bãi hoặc xe chưa vào đúng quy trình.\";\n    // Báo cáo số chỗ trống hiện tại (lấy từ dữ liệu database đọc được)\n    let currentOccupied = 0;\n    let currentReserved = 0;\n    let currentPending = 0;\n    for (const spotId of spotIds) {\n        const spot = spots[spotId];\n        if (spot.status === \"occupied\") {\n            currentOccupied++;\n        } else if (spot.status === \"reserved\") {\n            currentReserved++;\n        } else if (spot.status === \"pending_entries\") {\n            currentPending++;\n        }\n    }\n    msg.spots_to_report_in_response = Math.max(0, totalSpots - currentOccupied - currentReserved - currentPending);\n    msg.statusCode_final = 404; // Not Found\n\n    msg.payload = {};\n    return [null, msg]; // Gửi về nhánh lỗi\n}",
+        "outputs": 2,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 790,
+        "y": 780,
+        "wires": [
+            [
+                "510a0e109fb915fc",
+                "9cf35b477c8ca2e7"
+            ],
+            [
+                "94f36abdded89077",
+                "7854a6bbf8335901"
+            ]
+        ]
+    },
+    {
+        "id": "30480459d62a1732",
+        "type": "function",
+        "z": "3bcad979e3234c31",
+        "name": "Thông báo xe ra thành công",
+        "func": "msg.payload = {\n    action: msg.action_result_final,\n    message: msg.message_final,\n    rfid_received: msg.rfid_uid_received,\n    available_spots: msg.spots_to_report_in_response\n};\nmsg.statusCode = msg.statusCode_final;\n\n// Dọn dẹp (giữ lại các trường cần thiết cho phản hồi)\nconst responsePayload = msg.payload;\nconst statusCode = msg.statusCode;\n\n// Xóa tất cả các trường khác trong msg trừ _msgid\nfor (const key in msg) {\n    if (key !== '_msgid' && key !== 'payload' && key !== 'statusCode') {\n        delete msg[key];\n    }\n}\n\nmsg.payload = responsePayload; // Gán lại payload phản hồi\nmsg.statusCode = statusCode; // Gán lại statusCode phản hồi\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1320,
+        "y": 680,
+        "wires": [
+            [
+                "e3aeba92dfe2c66f",
+                "01370e80ad490e9b"
+            ]
+        ]
+    },
+    {
+        "id": "e3aeba92dfe2c66f",
+        "type": "http response",
+        "z": "3bcad979e3234c31",
+        "name": "Mở cổng",
+        "statusCode": "",
+        "headers": {},
+        "x": 1600,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "3acfbee4dc6e7c08",
+        "type": "firebase.once",
+        "z": "3bcad979e3234c31",
+        "name": "Đọc bookings trên server",
+        "firebaseconfig": "aee7f3977f504759",
+        "childpath": "bookings",
+        "repeatifnull": false,
+        "eventType": "value",
+        "queries": [],
+        "x": 590,
+        "y": 220,
+        "wires": [
+            [
+                "861d27250d9190e7"
+            ]
+        ]
+    },
+    {
+        "id": "6c55461978ec3081",
+        "type": "firebase.once",
+        "z": "3bcad979e3234c31",
+        "name": "Kiểm tra server còn chỗ không",
+        "firebaseconfig": "aee7f3977f504759",
+        "childpath": "parking_lots/lot_1",
+        "repeatifnull": false,
+        "eventType": "value",
+        "queries": [],
+        "x": 1330,
+        "y": 200,
+        "wires": [
+            [
+                "35f435f3318317dc"
+            ]
+        ]
+    },
+    {
+        "id": "d5a6313c0e481b5a",
+        "type": "firebase modify",
+        "z": "3bcad979e3234c31",
+        "name": "Cập nhật thông tin lên server",
+        "firebaseconfig": "aee7f3977f504759",
+        "childpath": "",
+        "method": "update",
+        "value": "msg.payload",
+        "priority": "msg.priority",
+        "x": 1840,
+        "y": 60,
+        "wires": [
+            [
+                "f2233f9863e6e7aa"
+            ]
+        ]
+    },
+    {
+        "id": "2a2154627b9cc6f8",
+        "type": "firebase modify",
+        "z": "3bcad979e3234c31",
+        "name": "Cập nhật thông tin lên server",
+        "firebaseconfig": "aee7f3977f504759",
+        "childpath": "",
+        "method": "update",
+        "value": "msg.payload",
+        "priority": "msg.priority",
+        "x": 2140,
+        "y": 180,
+        "wires": [
+            [
+                "f2233f9863e6e7aa"
+            ]
+        ]
+    },
+    {
+        "id": "e55caf42c0936b6d",
+        "type": "firebase.once",
+        "z": "3bcad979e3234c31",
+        "name": "Đọc toàn bộ DB",
+        "firebaseconfig": "aee7f3977f504759",
+        "childpath": "",
+        "repeatifnull": false,
+        "eventType": "value",
+        "queries": [],
+        "x": 630,
+        "y": 860,
+        "wires": [
+            [
+                "ded77b69850a81fe"
+            ]
+        ]
+    },
+    {
+        "id": "510a0e109fb915fc",
+        "type": "firebase modify",
+        "z": "3bcad979e3234c31",
+        "name": "Cập nhật thông tin chỗ trống ",
+        "firebaseconfig": "aee7f3977f504759",
+        "childpath": "",
+        "method": "update",
+        "value": "msg.payload",
+        "priority": "msg.priority",
+        "x": 1000,
+        "y": 680,
+        "wires": [
+            [
+                "30480459d62a1732"
+            ]
+        ]
+    },
+    {
+        "id": "7d8b4c92a45976d3",
+        "type": "function",
+        "z": "3bcad979e3234c31",
+        "name": "Thông báo lỗi/hết chỗ ",
+        "func": "if (msg.error_message) {\n     msg.payload = { action: \"deny\", message: msg.error_message, rfid_received: msg.rfid_uid_received, available_spots: msg.spots_to_report_in_response };\n     msg.statusCode = 500; \n} else {\n     // Sử dụng thông báo đã set trong node trước đó (bf85979b2689e5e8)\n     msg.payload = { action: msg.action_result_final, message: msg.message_final, rfid_received: msg.rfid_uid_received, available_spots: msg.spots_to_report_in_response };\n     msg.statusCode = msg.statusCode_final; \n}\n\n// Dọn dẹp (giữ lại các trường cần thiết cho phản hồi)\nconst responsePayload = msg.payload;\nconst statusCode = msg.statusCode;\n\n// Xóa tất cả các trường khác trong msg trừ _msgid\nfor (const key in msg) {\n    if (key !== '_msgid' && key !== 'payload' && key !== 'statusCode') {\n        delete msg[key];\n    }\n}\n\nmsg.payload = responsePayload; // Gán lại payload phản hồi\nmsg.statusCode = statusCode; // Gán lại statusCode phản hồi\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 2400,
+        "y": 300,
+        "wires": [
+            [
+                "352379eab04bcf58",
+                "3b19848949e43781"
+            ]
+        ]
+    },
+    {
+        "id": "3b19848949e43781",
+        "type": "http response",
+        "z": "3bcad979e3234c31",
+        "name": "Đóng cổng",
+        "statusCode": "",
+        "headers": {},
+        "x": 2710,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "94f36abdded89077",
+        "type": "function",
+        "z": "3bcad979e3234c31",
+        "name": "Thông báo lỗi/nhầm thẻ",
+        "func": "// msg đã được chuẩn bị với thông tin lỗi (action_result_final, message_final, status_code_final)\n// trong Function node \"XE RA: Tìm spot & Chuẩn bị cập nhật\" ở nhánh lỗi.\n\nmsg.payload = {\n    action: msg.action_result_final,\n    message: msg.message_final,\n    rfid_received: msg.rfid_uid_received, // Vẫn giữ rfid nhận được trong phản hồi\n    available_spots: msg.spots_to_report_in_response // Báo cáo số chỗ trống hiện tại\n};\nmsg.statusCode = msg.statusCode_final;\n\n// Dọn dẹp các trường msg không cần thiết cho phản hồi\nconst responsePayload = msg.payload;\nconst statusCode = msg.statusCode;\nfor (const key in msg) {\n    if (key !== '_msgid' && key !== 'payload' && key !== 'statusCode') {\n        delete msg[key];\n    }\n}\nmsg.payload = responsePayload;\nmsg.statusCode = statusCode;\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1070,
+        "y": 920,
+        "wires": [
+            [
+                "501a1aa9724e7fd2",
+                "d2e09a231a9fdf9e"
+            ]
+        ]
+    },
+    {
+        "id": "501a1aa9724e7fd2",
+        "type": "http response",
+        "z": "3bcad979e3234c31",
+        "name": "Từ chối mở cổng",
+        "statusCode": "",
+        "headers": {},
+        "x": 1550,
+        "y": 920,
+        "wires": []
+    },
+    {
+        "id": "e0e91be86a8662f0",
+        "type": "debug",
+        "z": "3bcad979e3234c31",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 540,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "34e50b7479ad36ec",
+        "type": "debug",
+        "z": "3bcad979e3234c31",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "true",
+        "targetType": "full",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1050,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "0fdd3b76ba0c12bd",
+        "type": "debug",
+        "z": "3bcad979e3234c31",
+        "name": "debug 4",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1570,
+        "y": 20,
+        "wires": []
+    },
+    {
+        "id": "31ac22796785a1fe",
+        "type": "debug",
+        "z": "3bcad979e3234c31",
+        "name": "debug 5",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1850,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "20bb7537c93657b3",
+        "type": "debug",
+        "z": "3bcad979e3234c31",
+        "name": "debug 6",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 2630,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "352379eab04bcf58",
+        "type": "debug",
+        "z": "3bcad979e3234c31",
+        "name": "debug 7",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 2590,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "df115a108ed489e0",
+        "type": "debug",
+        "z": "3bcad979e3234c31",
+        "name": "debug 11",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 590,
+        "y": 700,
+        "wires": []
+    },
+    {
+        "id": "01370e80ad490e9b",
+        "type": "debug",
+        "z": "3bcad979e3234c31",
+        "name": "debug 12",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1530,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "d2e09a231a9fdf9e",
+        "type": "debug",
+        "z": "3bcad979e3234c31",
+        "name": "debug 13",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1330,
+        "y": 1000,
+        "wires": []
+    },
+    {
+        "id": "9cf35b477c8ca2e7",
+        "type": "debug",
+        "z": "3bcad979e3234c31",
+        "name": "debug 14",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1040,
+        "y": 720,
+        "wires": []
+    },
+    {
+        "id": "7854a6bbf8335901",
+        "type": "debug",
+        "z": "3bcad979e3234c31",
+        "name": "debug 15",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1040,
+        "y": 840,
+        "wires": []
+    },
+    {
+        "id": "08591338e8fb8793",
+        "type": "debug",
+        "z": "3bcad979e3234c31",
+        "name": "debug 16",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 230,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "4f9af2a4c84e8cae",
+        "type": "inject",
+        "z": "3bcad979e3234c31",
+        "name": "",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"rfid_uid\": \"DDEB82C3\"}",
+        "payloadType": "str",
+        "x": 90,
+        "y": 320,
+        "wires": [
+            [
+                "45ed03fceed39806"
+            ]
+        ]
+    },
+    {
+        "id": "b863f79f19227765",
+        "type": "firebase.once",
+        "z": "3bcad979e3234c31",
+        "name": "Đọc chỗ trống",
+        "firebaseconfig": "aee7f3977f504759",
+        "childpath": "parking_lots/lot_1",
+        "repeatifnull": false,
+        "eventType": "value",
+        "queries": [],
+        "x": 1200,
+        "y": 100,
+        "wires": [
+            [
+                "908f454b96d4dd07"
+            ]
+        ]
+    },
+    {
+        "id": "1716bc4a0c3d0c87",
+        "type": "http in",
+        "z": "1b48354d57473ee9",
+        "name": "",
+        "url": "esp8266/ir_update",
+        "method": "post",
+        "upload": false,
+        "swaggerDoc": "",
+        "x": 110,
+        "y": 160,
+        "wires": [
+            [
+                "c4f87c578acf6e24",
+                "044c26cc14933b89"
+            ]
+        ]
+    },
+    {
+        "id": "c4f87c578acf6e24",
+        "type": "json",
+        "z": "1b48354d57473ee9",
+        "name": "",
+        "property": "payload",
+        "action": "obj",
+        "pretty": false,
+        "x": 290,
+        "y": 220,
+        "wires": [
+            [
+                "e8e71384a57284f8"
+            ]
+        ]
+    },
+    {
+        "id": "bd51f1898542eac9",
+        "type": "function",
+        "z": "1b48354d57473ee9",
+        "name": "Kiểm tra và cập nhật lên server",
+        "func": "// Payload từ ESP8266 cảm biến IR: { \"slot_id\": \"spot_1\", \"status\": \"occupied\" }\nconst slotId = msg.original_payload.slot_id;\nconst irStatus = msg.original_payload.status;\n\n// msg.payload hiện tại chứa toàn bộ dữ liệu của parking_lots/lot_1 từ Firebase\nconst lotData = msg.payload; // Dữ liệu hiện tại của lot_1\nconst spots = lotData.spots;\nconst totalSpots = parseInt(lotData.total_spots) || 0;\n\nlet updatePayload = {}; // Payload sẽ được gửi tới node firebase modify\nlet currentSpotStatus = spots[slotId] ? spots[slotId].status : \"unknown\";\n\n// 1. Kiểm tra và xác thực dữ liệu đầu vào từ IR sensor\nif (!slotId || typeof slotId !== 'string' || !irStatus || !['occupied', 'empty'].includes(irStatus)) {\n    node.error(\"IR Sensor: Invalid payload format or value\", msg);\n    msg.payload = { action: 'error_ir', message: 'Yêu cầu cập nhật cảm biến không hợp lệ: Thiếu hoặc sai định dạng slot_id/status' };\n    msg.statusCode = 400;\n    return [null, msg]; // Gửi đến nhánh lỗi\n}\n\n// 2. Xác định trạng thái mới của spot dựa trên IR sensor và trạng thái hiện tại\nconst targetSpotPath = `parking_lots/lot_1/spots/${slotId}`;\nlet shouldUpdateFirebase = false; // Cờ để quyết định có cần gửi update lên Firebase không\n\nif (irStatus === \"occupied\") {\n    if (currentSpotStatus === \"pending_entries\") {\n        // Xe đã ở trạng thái chờ vào (pending_entries), nay IR xác nhận đã đỗ -> chuyển sang occupied\n        updatePayload[targetSpotPath + \"/status\"] = \"occupied\";\n        // available_spots không đổi vì đã giảm ở lối vào khi pending_entries\n        // và giờ chỉ chuyển trạng thái từ pending_entries sang occupied.\n        shouldUpdateFirebase = true;\n    } else if (currentSpotStatus === \"empty\") {\n        // IR báo occupied nhưng spot đang empty (xe vãng lai trực tiếp vào hoặc lỗi)\n        // Tùy thuộc vào logic, có thể chuyển sang occupied hoặc báo động.\n        // Ở đây, ta cập nhật thành occupied.\n        updatePayload[targetSpotPath + \"/status\"] = \"occupied\";\n        // available_spots cần giảm 1 nếu trạng thái ban đầu là empty\n        // LƯU Ý: logic này sẽ không xảy ra nếu xe luôn qua RFID lối vào trước.\n        // Nếu muốn xử lý trường hợp này, cần tính toán available_spots ở đây.\n        // Tạm thời, tôi giả định mọi xe vào đều qua RFID để có pending_entries trước.\n        node.warn(`IR Sensor: Spot ${slotId} was empty but IR reports occupied. Force update to occupied. Available spots will be re-calculated if a new car entered.`);\n        shouldUpdateFirebase = true;\n    } else if (currentSpotStatus === \"occupied\") {\n        // Đã occupied, không làm gì (không cần cập nhật trạng thái spot)\n        shouldUpdateFirebase = false;\n    } else {\n        // Các trường hợp khác (ví dụ: reserved nhưng IR báo occupied mà không qua pending_entries)\n        node.warn(`IR Sensor: Spot ${slotId} is ${currentSpotStatus} but IR reports occupied. Potential issue.`);\n        updatePayload[targetSpotPath + \"/status\"] = \"occupied\";\n        shouldUpdateFirebase = true;\n    }\n} else if (irStatus === \"empty\") {\n    if (currentSpotStatus === \"occupied\" || currentSpotStatus === \"pending_entries\") {\n        // Xe rời đi: chuyển từ occupied/pending_entries sang empty\n        updatePayload[targetSpotPath + \"/status\"] = \"empty\";\n        // KHÔNG XÓA RFID TAG VÀ TIME_IN Ở ĐÂY NỮA\n        // updatePayload[targetSpotPath + \"/rfid_tag\"] = null;\n        // updatePayload[targetSpotPath + \"/time_in\"] = null;\n        updatePayload[targetSpotPath + \"/time_out\"] = new Date().toISOString(); // Ghi time_out\n        shouldUpdateFirebase = true;\n\n        // Tăng available_spots lên 1 khi xe rời đi\n        const currentAvailableSpots = parseInt(lotData.available_spots) || 0;\n        const newAvailableSpots = Math.min(totalSpots, currentAvailableSpots + 1); // Đảm bảo không vượt quá totalSpots\n        updatePayload[`parking_lots/lot_1/available_spots`] = newAvailableSpots;\n\n    } else if (currentSpotStatus === \"empty\") {\n        // Đã empty, không làm gì\n        shouldUpdateFirebase = false;\n    } else {\n        // Các trường hợp khác (ví dụ: reserved nhưng IR báo empty)\n        node.warn(`IR Sensor: Spot ${slotId} is ${currentSpotStatus} but IR reports empty. Force update to empty.`);\n        updatePayload[targetSpotPath + \"/status\"] = \"empty\";\n        // KHÔNG XÓA RFID TAG VÀ TIME_IN Ở ĐÂY NỮA\n        // updatePayload[targetSpotPath + \"/rfid_tag\"] = null;\n        // updatePayload[targetSpotPath + \"/time_in\"] = null;\n        updatePayload[targetSpotPath + \"/time_out\"] = new Date().toISOString();\n        shouldUpdateFirebase = true;\n\n        // Tăng available_spots lên 1\n        const currentAvailableSpots = parseInt(lotData.available_spots) || 0;\n        const newAvailableSpots = Math.min(totalSpots, currentAvailableSpots + 1);\n        updatePayload[`parking_lots/lot_1/available_spots`] = newAvailableSpots;\n    }\n}\n\n// 3. Gửi payload cập nhật tới Firebase nếu có thay đổi\nif (shouldUpdateFirebase) {\n    msg.payload = updatePayload;\n    msg.statusCode = 200;\n    msg.action_result_final = \"ir_update_success\";\n    msg.message_final = `Updated spot ${slotId} status to ${irStatus}. Available spots updated.`;\n    return [msg, null]; // Gửi đến nhánh thành công\n} else {\n    // Không có thay đổi trạng thái nào cần cập nhật trên Firebase cho spot này\n    node.warn(`IR Sensor: No actual status change for spot ${slotId}.`);\n    return [null, null]; // Dừng flow nếu không có gì để cập nhật\n}",
+        "outputs": 2,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 710,
+        "y": 180,
+        "wires": [
+            [
+                "8a16763dddccb4a3",
+                "8d34b8c41a8e7af5"
+            ],
+            [
+                "01050c9dfd1bfc8a",
+                "9facb932f5896959"
+            ]
+        ]
+    },
+    {
+        "id": "8a16763dddccb4a3",
+        "type": "firebase modify",
+        "z": "1b48354d57473ee9",
+        "name": "Cập nhật trạng thái spot",
+        "firebaseconfig": "aee7f3977f504759",
+        "childpath": "",
+        "method": "update",
+        "value": "msg.payload",
+        "priority": "",
+        "x": 930,
+        "y": 60,
+        "wires": [
+            [
+                "daa0bafd47aa0885"
+            ]
+        ]
+    },
+    {
+        "id": "daa0bafd47aa0885",
+        "type": "http response",
+        "z": "1b48354d57473ee9",
+        "name": "Cập nhật thành công",
+        "statusCode": "200",
+        "headers": {},
+        "x": 1200,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "01050c9dfd1bfc8a",
+        "type": "http response",
+        "z": "1b48354d57473ee9",
+        "name": "Báo lỗi IR Sensor",
+        "statusCode": "400",
+        "headers": {},
+        "x": 1110,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "044c26cc14933b89",
+        "type": "debug",
+        "z": "1b48354d57473ee9",
+        "name": "debug 8",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 270,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "8d34b8c41a8e7af5",
+        "type": "debug",
+        "z": "1b48354d57473ee9",
+        "name": "debug 9",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 980,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "9facb932f5896959",
+        "type": "debug",
+        "z": "1b48354d57473ee9",
+        "name": "debug 10",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1060,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "e8e71384a57284f8",
+        "type": "change",
+        "z": "1b48354d57473ee9",
+        "name": "Lưu original payload",
+        "rules": [
+            {
+                "t": "set",
+                "p": "original_payload",
+                "pt": "msg",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 470,
+        "y": 280,
+        "wires": [
+            [
+                "24c20f42a7660a92"
+            ]
+        ]
+    },
+    {
+        "id": "24c20f42a7660a92",
+        "type": "firebase.once",
+        "z": "1b48354d57473ee9",
+        "name": "Đọc dữ liệu bãi đỗ",
+        "firebaseconfig": "aee7f3977f504759",
+        "childpath": "parking_lots/lot_1",
+        "repeatifnull": false,
+        "eventType": "value",
+        "queries": [],
+        "x": 490,
+        "y": 100,
+        "wires": [
+            [
+                "bd51f1898542eac9"
+            ]
+        ]
+    },
+    {
+        "id": "e7c2c9d2f21a4f02",
+        "type": "inject",
+        "z": "1b48354d57473ee9",
+        "name": "IR: spot_1 -> occupied (từ pending_entries)",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"slot_id\":\"spot_2\",\"status\":\"occupied\"}",
+        "payloadType": "json",
+        "x": 210,
+        "y": 360,
+        "wires": [
+            [
+                "c4f87c578acf6e24"
+            ]
+        ]
+    },
+    {
+        "id": "520f8c3e800d9e11",
+        "type": "inject",
+        "z": "1b48354d57473ee9",
+        "name": "IR: spot_2 -> empty (từ occupied)",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"slot_id\":\"spot_2\",\"status\":\"empty\"}",
+        "payloadType": "json",
+        "x": 210,
+        "y": 440,
+        "wires": [
+            [
+                "c4f87c578acf6e24"
+            ]
+        ]
+    },
+    {
+        "id": "8c3b7a5a8f4c9b20",
+        "type": "inject",
+        "z": "1b48354d57473ee9",
+        "name": "IR: spot_3 -> occupied (từ empty, simulate lỗi)",
+        "props": [
+            {
+                "p": "payload"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "{\"slot_id\":\"spot_3\",\"status\":\"occupied\"}",
+        "payloadType": "json",
+        "x": 210,
+        "y": 520,
+        "wires": [
+            [
+                "c4f87c578acf6e24"
+            ]
+        ]
+    },
+    {
+        "id": "58419dfe908211ec",
+        "type": "firebase.on",
+        "z": "a16b73657f0d2c2a",
+        "name": "Realtime Lot 1",
+        "firebaseconfig": "aee7f3977f504759",
+        "childpath": "parking_lots/lot_1/spots",
+        "atStart": true,
+        "eventType": "value",
+        "queries": [],
+        "x": 140,
+        "y": 100,
+        "wires": [
+            [
+                "28da355546186fca",
+                "f4b0866b3ffe340a"
+            ]
+        ]
+    },
+    {
+        "id": "28da355546186fca",
+        "type": "function",
+        "z": "a16b73657f0d2c2a",
+        "name": "Chuyển danh sách spot",
+        "func": "let raw = msg.payload;\nlet result = [];\n\nfor (let spotId in raw) {\n    let s = raw[spotId];\n    result.push({\n        id: spotId,\n        status: s.status || \"empty\",\n        rfid: s.rfid_tag || \"\",\n        time_in: s.time_in || \"\",\n        time_out: s.time_out || \"\",\n        user: s.userID || \"\",\n        booking_ref: s.booking_ref || \"\"\n    });\n}\n\nmsg.payload = result;\n// Lưu trữ danh sách spot đã định dạng vào context của flow\nflow.set('spotList', result);\n\n// Kiểm tra nếu msg.selected_spot chưa được set hoặc đã bị clear\nif (typeof msg.selected_spot === 'undefined' || msg.selected_spot === null) {\n     msg.selected_spot = null; // Đảm bảo nó là null nếu chưa có\n}\n\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 410,
+        "y": 100,
+        "wires": [
+            [
+                "32afed69447f2d75",
+                "afdfe9179e7aad13"
+            ]
+        ]
+    },
+    {
+        "id": "32afed69447f2d75",
+        "type": "ui_template",
+        "z": "a16b73657f0d2c2a",
+        "group": "ui_group_lot1",
+        "name": "Lưới chỗ đỗ (3x2)",
+        "order": 1,
+        "width": "12",
+        "height": "6",
+        "format": "<style>\n  /* Định nghĩa bố cục lưới 2 hàng x 3 cột */\n  .parking-grid {\n    display: grid;\n    grid-template-columns: repeat(3, 1fr);\n    /* 3 cột có chiều rộng bằng nhau */\n    grid-gap: 15px;\n    /* Khoảng cách giữa các ô */\n    padding: 10px;\n  }\n\n  /* Tùy chỉnh nút bấm */\n  .spot-button {\n    width: 100%;\n    height: 80px;\n    /* Chiều cao cố định cho nút */\n    display: flex;\n    /* Dùng flexbox để căn giữa nội dung */\n    flex-direction: column;\n    justify-content: center;\n    align-items: center;\n    text-align: center;\n    font-weight: bold;\n    color: white;\n    /* Màu chữ trắng */\n    transition: background-color 0.5s ease;\n    /* Hiệu ứng chuyển màu nền trong 0.5s */\n    border-radius: 5px;\n    /* Bo tròn góc */\n    padding: 5px;\n    box-sizing: border-box;\n    /* Tính padding và border vào kích thước */\n  }\n\n  /* Định nghĩa màu nền cho từng trạng thái */\n  .status-occupied {\n    background-color: #f44336;\n    /* Đỏ */\n  }\n\n  .status-reserved {\n    background-color: #ff9800;\n    /* Cam */\n  }\n\n  .status-empty {\n    background-color: #4caf50;\n    /* Xanh lá cây */\n  }\n\n  .status-pending-entries {\n    /* THÊM TRẠNG THÁI MỚI */\n    background-color: #2196f3;\n    /* Xanh dương */\n  }\n\n  .status-unknown {\n    /* Trường hợp trạng thái không xác định */\n    background-color: #9e9e9e;\n    /* Xám */\n  }\n\n  /* Hiệu ứng khi hover */\n  .spot-button:hover {\n    opacity: 0.9;\n  }\n</style>\n\n<div ng-if=\"!msg.selected_spot\">\n  <div class=\"parking-grid\">\n    <div ng-repeat=\"spot in msg.payload\">\n      <md-button class=\"md-raised spot-button\" ng-class=\"{\n           'status-occupied': spot.status === 'occupied',\n           'status-reserved': spot.status === 'reserved',\n           'status-empty': spot.status === 'empty',\n           'status-pending-entries': spot.status === 'pending_entries',\n           'status-unknown': !spot.status || (spot.status !== 'occupied' && spot.status !== 'reserved' && spot.status !== 'empty' && spot.status !== 'pending_entries')\n         }\" ng-click=\"send({payload: spot})\">\n        <b>{{spot.id}}</b><br/>{{(spot.status || 'unknown') | uppercase}}\n      </md-button>\n    </div>\n  </div>\n</div>\n\n<script>\n  // Hàm getColor không còn cần thiết vì chúng ta dùng ng-class và CSS\n  // Nếu bạn muốn dùng lại getColor cho mục đích khác thì giữ lại, còn không thì xóa đi.\n  // $scope.getColor = function(status) {\n  //  if (status === 'occupied') return '#f44336';\n  //  if (status === 'reserved') return '#ff9800';\n  //  return '#4caf50';\n  // };\n</script>",
+        "storeOutMessages": true,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 790,
+        "y": 80,
+        "wires": [
+            [
+                "074be43077c8f699"
+            ]
+        ]
+    },
+    {
+        "id": "074be43077c8f699",
+        "type": "function",
+        "z": "a16b73657f0d2c2a",
+        "name": "Gán spot được chọn",
+        "func": "// Node này vẫn giữ nguyên như cũ\nmsg.selected_spot = msg.payload; // msg.payload lúc này là data của spot được click\nmsg.payload = null; // Không cần payload để hiển thị lưới nữa\n\n// Lấy lại danh sách spot từ context flow và gán vào msg.payload\nmsg.payload = flow.get('spotList') || []; // Lấy danh sách spot đã lưu\n\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1220,
+        "y": 60,
+        "wires": [
+            [
+                "32afed69447f2d75",
+                "afdfe9179e7aad13"
+            ]
+        ]
+    },
+    {
+        "id": "afdfe9179e7aad13",
+        "type": "ui_template",
+        "z": "a16b73657f0d2c2a",
+        "group": "ui_group_lot1",
+        "name": "Chi tiết + Quay lại",
+        "order": 2,
+        "width": "12",
+        "height": "6",
+        "format": "<div ng-if=\"msg.selected_spot\">\n  <div style=\"padding: 15px; border: 1px solid #ccc; border-radius: 5px; background-color: #f9f9f9;\">\n    <h3 style=\"font-size: 1.3em; margin-bottom: 10px; color: #333;\">Chi tiết chỗ đỗ: {{msg.selected_spot.id}}</h3>\n    <div style=\"font-size: 1em; line-height: 1.6;\">\n      <p style=\"margin-bottom: 5px;\"><b>Trạng thái:</b> {{msg.selected_spot.status | uppercase}}</p>\n      <p style=\"margin-bottom: 5px;\"><b>RFID:</b> {{msg.selected_spot.rfid || 'N/A'}}</p>\n      <p style=\"margin-bottom: 5px;\"><b>Time In:</b> {{msg.selected_spot.time_in || 'N/A'}}</p>\n      <p style=\"margin-bottom: 5px;\"><b>Time Out:</b> {{msg.selected_spot.time_out || 'N/A'}}</p>\n      <p style=\"margin-bottom: 5px;\"><b>User ID:</b> {{msg.selected_spot.user || 'N/A'}}</p>\n      <p style=\"margin-bottom: 10px;\"><b>Booking Ref:</b> {{msg.selected_spot.booking_ref || 'N/A'}}</p>\n    </div>\n    <md-button class=\"md-raised md-warn\" ng-click=\"send({payload: 'back'})\" style=\"margin-top: 10px;\">⬅ Quay lại\n    </md-button>\n  </div>\n</div>",
+        "storeOutMessages": true,
+        "fwdInMessages": false,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 830,
+        "y": 260,
+        "wires": [
+            [
+                "05592a4cb2519dd1"
+            ]
+        ]
+    },
+    {
+        "id": "05592a4cb2519dd1",
+        "type": "function",
+        "z": "a16b73657f0d2c2a",
+        "name": "Xử lý quay lại",
+        "func": "if (msg.payload === 'back') {\n    msg.selected_spot = null; // Đặt lại selected_spot về null\n    // Lấy lại danh sách spot từ context flow và gán vào msg.payload\n    msg.payload = flow.get('spotList') || [];\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1280,
+        "y": 260,
+        "wires": [
+            [
+                "32afed69447f2d75",
+                "afdfe9179e7aad13"
+            ]
+        ]
+    },
+    {
+        "id": "f4b0866b3ffe340a",
+        "type": "debug",
+        "z": "a16b73657f0d2c2a",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 350,
+        "y": 300,
+        "wires": []
+    }
+]

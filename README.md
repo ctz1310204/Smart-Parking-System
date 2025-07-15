@@ -1,12 +1,12 @@
-# 🚗 Smart Parking System – IoT Project
+# Smart Parking System – IoT Project
 
 A full-stack IoT-based Smart Parking System that integrates embedded hardware, cloud database, and mobile application to provide a real-time solution for managing parking slots.
 
-> 📌 This project was developed as part of a university course and showcases end-to-end integration of IoT hardware, backend automation, and mobile app development.
+> This project was developed as part of a university course and showcases end-to-end integration of IoT hardware, backend automation, and mobile app development.
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```
 Smart-Parking-System/
@@ -19,7 +19,7 @@ Smart-Parking-System/
 
 ---
 
-## 📱 Mobile App – Flutter
+## Mobile App – Flutter
 
 The Flutter app allows users to:
 
@@ -29,7 +29,7 @@ The Flutter app allows users to:
 
 **Tech used:** Flutter, Dart, Firebase
 
-### 🚀 To Run:
+### To Run:
 
 ```bash
 cd iot/flutter_app
@@ -37,11 +37,11 @@ flutter pub get
 flutter run
 ```
 
-> ⚠️ You will need your own `google-services.json` to connect to Firebase.
+> You will need your own `google-services.json` to connect to Firebase.
 
 ---
 
-## 🔁 Node-RED Flow
+## Node-RED Flow
 
 - Reads sensor data from ESP8266 (IR and RFID)
 - Controls servo motor for gate operation
@@ -50,7 +50,7 @@ flutter run
 
 **File:** [`node_red_smartparking_final.json`](iot/node_red_smartparking_final.json)
 
-### 🛠 To Use:
+### To Use:
 
 1. Open Node-RED  
 2. Import the JSON flow  
@@ -58,7 +58,7 @@ flutter run
 
 ---
 
-## 🔗 Firebase Realtime Database
+## Firebase Realtime Database
 
 Used to store:
 
@@ -68,7 +68,7 @@ Used to store:
 
 **File:** [`firebase_smartparking_final.json`](iot/firebase_smartparking_final.json)
 
-### 🧱 Structure Sample:
+### Structure Sample:
 
 ```json
 {
@@ -92,13 +92,13 @@ Used to store:
 
 ---
 
-## 👨‍💻 Author
+## Author
 
 **Chu Tâm Vũ**  
 GitHub: [@ctz1310204](https://github.com/ctz1310204)
 
 ---
 
-## 📚 License
+## License
 
 This project is for educational purposes only. Feel free to use and adapt it with credit.

@@ -6,70 +6,78 @@ A full-stack IoT-based Smart Parking System that integrates embedded hardware, c
 
 ---
 
-## Project Structure
+## Table of Contents
 
-```
-Smart-Parking-System/
-└── iot/
-    ├── flutter_app/                 # Flutter mobile app
-    ├── node_red_smartparking_final.json     # Node-RED flow
-    ├── firebase_smartparking_final.json     # Firebase structure
-    ├── README.md                    # This file
-```
+- [Project Overview](#project-overview)
+- [Technologies Used](#technologies-used)
+- [Features](#features)
+- [Architecture and Components](#architecture-and-components)
+- [Node-RED Flow](#node-red-flow)
+- [Firebase Structure](#firebase-structure)
+- [Mobile App](#mobile-app)
+- [Installation & Running](#installation--running)
+- [Author](#author)
+- [License](#license)
 
 ---
 
-## Mobile App – Flutter
+## Project Overview
 
-The Flutter app allows users to:
+This system allows vehicles to enter and exit a parking lot automatically using ESP8266-based hardware, IR sensors, RFID readers, and servo motors. It updates status in Firebase Realtime Database and reflects changes instantly in a Flutter-based mobile application.
 
-- View available parking slots in real-time  
-- Book/reserve slots via Firebase Realtime Database  
-- Receive feedback on parking status (occupied, empty)
+Developed from **February 2025 – May 2025**, it demonstrates real-time hardware–cloud–app integration.
 
-**Tech used:** Flutter, Dart, Firebase
+---
 
-### To Run:
+## Technologies Used
 
-```bash
-cd iot/flutter_app
-flutter pub get
-flutter run
+- **Hardware:** ESP8266, IR Sensor, RFID Reader, Servo Motor
+- **Backend:** Node-RED, Firebase Realtime Database
+- **Mobile:** Flutter, Dart
+- **Communication:** HTTP, JSON
+
+---
+
+## Features
+
+- Real-time parking slot status detection via sensors
+- RFID-based vehicle identification
+- Servo control for automatic gate opening
+- Firebase cloud integration for real-time data sync
+- Flutter mobile app for user interaction and monitoring
+
+---
+
+## Architecture and Components
+
+- **ESP8266 + IR/RFID:** Detect car presence and read RFID
+- **Node-RED:** Receives data, handles logic, updates Firebase
+- **Firebase:** Stores slot status, timestamps, reservations
+- **Flutter App:** Retrieves real-time data and allows user interaction
+
 ```
-
-> You will need your own `google-services.json` to connect to Firebase.
+Vehicle → ESP8266 → Node-RED → Firebase → Flutter App
+```
 
 ---
 
 ## Node-RED Flow
 
-- Reads sensor data from ESP8266 (IR and RFID)
-- Controls servo motor for gate operation
-- Updates Firebase Realtime Database with spot status and reservation details
-- Receives data via HTTP POST from ESP8266 modules
-
 **File:** [`node_red_smartparking_final.json`](iot/node_red_smartparking_final.json)
 
-### To Use:
-
-1. Open Node-RED  
-2. Import the JSON flow  
-3. Deploy and test with HTTP requests from your device
+### Key Logic:
+- HTTP endpoints for ESP8266 to report entry/exit
+- Parses RFID and IR signals
+- Updates `spots` and `reservations` in Firebase
+- Uses function nodes for conditional logic and formatting
 
 ---
 
-## Firebase Realtime Database
-
-Used to store:
-
-- Current spot status (occupied/empty)  
-- Vehicle RFID and time in/out  
-- User reservations and booking times
+## Firebase Structure
 
 **File:** [`firebase_smartparking_final.json`](iot/firebase_smartparking_final.json)
 
-### Structure Sample:
-
+### Sample:
 ```json
 {
   "spots": {
@@ -89,6 +97,38 @@ Used to store:
   }
 }
 ```
+
+---
+
+## Mobile App
+
+**Location:** [`iot/flutter_app/`](iot/flutter_app/)
+
+### Built with:
+- Flutter, Dart, Firebase Realtime DB
+
+### Features:
+- View live parking spot status
+- Make and cancel reservations
+- Connects directly to Firebase using streams
+
+---
+
+## Installation & Running
+
+### Run Flutter App:
+```bash
+cd iot/flutter_app
+flutter pub get
+flutter run
+```
+
+> Ensure you provide your own `google-services.json` for Firebase integration.
+
+### Use Node-RED Flow:
+1. Open Node-RED
+2. Import `node_red_smartparking_final.json`
+3. Deploy and test with HTTP from ESP8266
 
 ---
 
